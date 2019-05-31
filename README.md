@@ -5,6 +5,13 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 1. Tool Use: requires an agent to continuously control its hands to make use of a tool.
 2. Preparing dishes: agents must perform a series of atomic actions in the right order to achieve a compositional goal.
 
+## Requirements ##
+* OS: Ubuntu 16.04
+* Python 2.7.12
+* PyTorch 0.4.1
+* numpy 1.16.2
+* rapidjson: https://github.com/hhatto/pyrapidjson
+
 ## Getting Started ##
 1. clone the repo
 
@@ -12,4 +19,4 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 
 3. run the Script/example_dish.py and Script/example_tool.py
 
-
+Have fun!
