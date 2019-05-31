@@ -6,6 +6,9 @@
 
 from .network_utils import *
 from .network_bodies import *
+from .lang_encoder import *
+from .state_encoder import *
+from .fusion import *
 
 class VanillaNet(nn.Module, BaseNet):
     def __init__(self, output_dim, body):
@@ -179,5 +182,63 @@ class CategoricalActorCriticNet(nn.Module, BaseNet):
         # print logits
         if action is None:
             action = dist.sample()
+        log_prob = dist.log_prob(action).unsqueeze(-1)
+        return action, log_prob, dist.entropy().unsqueeze(-1), v
+
+class SubGoalActorCriticNet(nn.Module):
+    def __init__(self,
+                 state_dim,
+                 action_dim,
+                 dict_size=45,
+                 lang_embed_dim=64,
+                 phi_body=None,
+                 actor_body=None,
+                 critic_body=None,
+                 latent_dim=256):
+        super(SubGoalActorCriticNet, self).__init__()
+        if phi_body is None: phi_body = DummyBody(state_dim)
+        if actor_body is None: actor_body = DummyBody(phi_body.feature_dim)
+        if critic_body is None: critic_body = DummyBody(phi_body.feature_dim)
+        self.lang_embed_dim = lang_embed_dim
+        self.dict_size = dict_size
+        self.phi_body = phi_body
+        self.actor_body = actor_body
+        self.critic_body = critic_body
+        self.latent_dim = latent_dim
+        self.fc_action = layer_init(nn.Linear(actor_body.feature_dim, action_dim), 1e-3)
+        self.fc_critic = layer_init(nn.Linear(critic_body.feature_dim, 1), 1e-3)
+        self.lang_embeds = LangEncoderBoW(self.dict_size, self.lang_embed_dim)
+        self.fc1 = layer_init(nn.Linear(2*self.lang_embed_dim, self.phi_body.feature_dim), 1e-3)
+        self.fusion_cat = FusionCat(self.phi_body.feature_dim, self.phi_body.feature_dim)
+        self.fc2 = layer_init(nn.Linear(self.phi_body.feature_dim, self.phi_body.feature_dim), 1e-3)
+        # self.lstm = nn.LSTMCell(self.phi_body.feature_dim, self.latent_dim)
+        # self.hidden = self.init_hidden()
+
+        self.actor_params = list(self.actor_body.parameters()) + list(self.fc_action.parameters())
+        self.critic_params = list(self.critic_body.parameters()) + list(self.fc_critic.parameters())
+        self.phi_params = list(self.phi_body.parameters())
+        self.to(Config.DEVICE)
+
+    def init_hidden(self):
+        return (torch.rand(1, self.latent_dim).to(Config.DEVICE), \
+            torch.rand(1, self.latent_dim).to(Config.DEVICE))
+
+    def forward(self, obs, subgoal):
+        task_embed = self.lang_embeds(subgoal[0].view(1,1))
+        ingred_embed = self.lang_embeds(subgoal[1].view(1,1))
+        phi = self.phi_body(obs)
+        t_i_cat = torch.cat((task_embed, ingred_embed), dim=-1)
+        t_i_cat = F.relu(self.fc1(t_i_cat))
+        t_i_im_cat = self.fusion_cat(phi, t_i_cat)
+        phi_cat = F.relu(self.fc2(t_i_im_cat))
+        # self.hidden = self.lstm(phi_cat, self.hidden)
+
+        phi_a = self.actor_body(phi_cat)
+        phi_v = self.critic_body(phi_cat)
+        logits = self.fc_action(phi_a)
+        v = self.fc_critic(phi_v)
+        dist = torch.distributions.Categorical(logits=logits)
+        # print logits
+        action = dist.sample()
         log_prob = dist.log_prob(action).unsqueeze(-1)
         return action, log_prob, dist.entropy().unsqueeze(-1), v

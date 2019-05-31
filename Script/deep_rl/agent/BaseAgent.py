@@ -74,7 +74,7 @@ class BaseActor(mp.Process):
             random_seed()
             seed = np.random.randint(0, sys.maxsize)
             self._task = config.task_fn()
-            self._task.seed(seed)
+            # self._task.seed(seed)
 
     def _sample(self):
         transitions = []
@@ -89,7 +89,7 @@ class BaseActor(mp.Process):
         random_seed()
         seed = np.random.randint(0, sys.maxsize)
         self._task = config.task_fn()
-        self._task.seed(seed)
+        # self._task.seed(seed)
 
         cache = deque([], maxlen=2)
         while True:

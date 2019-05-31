@@ -8,7 +8,7 @@ from ..network import *
 from ..component import *
 from .BaseAgent import *
 
-class A2CAgent(BaseAgent):
+class A2CAgentCurr(BaseAgent):
     def __init__(self, config):
         BaseAgent.__init__(self, config)
         self.config = config
@@ -17,34 +17,59 @@ class A2CAgent(BaseAgent):
         self.optimizer = config.optimizer_fn(self.network.parameters())
         self.total_steps = 0
         self.states = self.task.reset()
-        self.episode_rewards = []
-        self.online_rewards = np.zeros(config.num_workers)
-        self.terminals = []
+        self.step_rewards = 0
+        self.roll_rewards = 0
+        self.eval_rewards = 0
 
-    def step(self):
+    def eval(self, sub_goal):
+        config = self.config
+        states = self.states
+        self.eval_rewards = 0
+        for _ in range(config.rollout_length):
+            actions, log_probs, entropy, values = self.network(config.state_normalizer(states), sub_goal)
+            next_states, rewards, terminals, _ = self.task.step(actions.detach().cpu().numpy(), rollout=True)
+            self.eval_rewards += rewards
+            states = next_states.view(1,3,84,84).cuda()
+            if terminals:
+                break
+        self.states = states
+
+    # rollout subpolicy
+    def roll(self, sub_goal):
+        config = self.config
+        states = self.states
+        self.roll_rewards = 0
+
+        for _ in range(config.rollout_length):
+            actions, log_probs, entropy, values = self.network(config.state_normalizer(states), sub_goal)
+            next_states, rewards, terminals, _ = self.task.step(actions.detach().cpu().numpy(), sub_goal, True)
+            self.roll_rewards += rewards
+            states = next_states.view(1,3,84,84).cuda()
+            if terminals:
+                break
+        self.states = states
+
+    # update subpolicy
+    def step(self, sub_goal):
         config = self.config
         rollout = []
-        states = self.states
-        for _ in range(config.rollout_length):
-            actions, log_probs, entropy, values = self.network(config.state_normalizer(states.view(1,3,84,84)))
-            next_states, rewards, terminals, _ = self.task.step(actions.detach().cpu().numpy())
-            self.online_rewards += rewards
-            rewards = config.reward_normalizer(rewards)
-            terminals = [terminals]
-            for i, terminal in enumerate(terminals):
-                if terminals[i]:
-                    self.episode_rewards.append(self.online_rewards[i])
-                    self.online_rewards[i] = 0
-
-            rollout.append([log_probs, values, actions, rewards, 1 - terminals[0], entropy])
-            states = next_states.view(1,3,84,84)
+        states = self.states       
+        self.step_rewards = 0
+        for _ in range(config.step_length):
+            actions, log_probs, entropy, values = self.network(config.state_normalizer(states), sub_goal)
+            next_states, rewards, terminals, _ = self.task.step(actions.detach().cpu().numpy(), sub_goal)
+            self.step_rewards += rewards
+            rollout.append([log_probs, values, actions, rewards, 1 - terminals, entropy])
+            states = next_states.view(1,3,84,84).cuda()
+            if terminals:
+                break
 
         self.states = states
-        pending_value = self.network(config.state_normalizer(states))[-1]
+        pending_value = self.network(config.state_normalizer(states), sub_goal)[-1]
         rollout.append([None, pending_value, None, None, None, None])
 
         processed_rollout = [None] * (len(rollout) - 1)
-        advantages = tensor(np.zeros((config.num_workers, 1)))
+        advantages = tensor(np.zeros((1, 1)))
         returns = pending_value.detach()
         for i in reversed(range(len(rollout) - 1)):
             log_prob, value, actions, rewards, terminals, entropy = rollout[i]
@@ -81,23 +106,22 @@ class A2CAgent(BaseAgent):
         nn.utils.clip_grad_norm_(self.network.parameters(), config.gradient_clip)
         self.optimizer.step()
 
-        steps = config.rollout_length * config.num_workers
+        steps = config.rollout_length
         self.total_steps += steps
 
         return total_loss
 
     def save(self, filename):
         torch.save(self.network.state_dict(), filename)
-        with open(filename.strip(".bin"), 'wb') as f:
-            pickle.dump([self.total_steps, self.optimizer, self.online_rewards, self.episode_rewards, self.states], f)
+        with open(filename[0:-4], 'wb') as f:
+            pickle.dump([self.total_steps, self.optimizer, self.states], f)
 
     def load(self, filename):
-        state_dict = torch.load(filename, map_location=lambda storage, loc: storage)
-        self.network.load_state_dict(state_dict)
-        with open(filename.strip(".bin"), 'rb') as f:
+        with open(filename[0:-4], 'rb') as f:
             a = pickle.load(f)
         self.total_steps = a[0]
         self.optimizer = a[1]
-        self.online_rewards = a[2]
-        self.episode_rewards = a[3]
-        self.states = a[4]
+        self.states = a[2]
+
+        state_dict = torch.load(filename, map_location=lambda storage, loc: storage)
+        self.network.load_state_dict(state_dict)

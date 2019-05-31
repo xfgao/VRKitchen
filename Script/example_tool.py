@@ -4,15 +4,17 @@ import random
 
 from DiscreteAgent import DiscreteAgent
 from deep_rl import *
-from recipe_task import CutCarrot, PourWater, GetWater, OpenCan, PeelKiwi
+from task_tool import CutCarrot, PourWater, GetWater, OpenCan, PeelKiwi
 
 # torch.manual_seed(0)
 # np.random.seed(0)
 # random.seed(0)
 
-def ddpg_pixel():
+TaskMap = {"CutCarrot":CutCarrot, "PourWater":PourWater, "GetWater":GetWater, "OpenCan":OpenCan, "PeelKiwi":PeelKiwi}
+
+def ddpg_pixel(task_name, mstep):
 	config = Config()
-	config.task_fn = lambda : PourWater(frame_skip=1)
+	config.task_fn = lambda : TaskMap[task_name](frame_skip=1, max_steps=mstep)
 	config.eval_env = config.task_fn()
 	config.state_dim = 84
 	config.action_dim = 7
@@ -46,7 +48,7 @@ def ddpg_pixel():
 		print(e)
 	run_steps(my_agent)
 
-def ppo_continuous():
+def ppo_continuous(task_name, mstep):
 	config = Config()
 	config.num_workers = 1
 	config.name = "ppo"
@@ -55,7 +57,7 @@ def ppo_continuous():
 	config.action_dim = 7
 	phi_body = NatureConvBody()
 	config.state_normalizer = ImageNormalizer()
-	config.task_fn = lambda : GetWater(frame_skip=1)
+	config.task_fn = lambda : TaskMap[task_name](frame_skip=1, max_steps=mstep)
 	config.task_name = config.task_fn().name
 	config.eval_env = config.task_fn()
 	config.network_fn = lambda: GaussianActorCriticNet(
@@ -83,7 +85,7 @@ def ppo_continuous():
 		print(e)
 	run_steps(my_agent)
 
-def a2c_continuous():
+def a2c_continuous(task_name, mstep):
 	config = Config()
 	config.name = "a2c"
 	config.tag = "hugerollout"
@@ -93,7 +95,7 @@ def a2c_continuous():
 	config.history_length = 1
 	config.num_workers = 1
 	config.state_normalizer = ImageNormalizer()
-	config.task_fn = lambda : OpenCan(frame_skip=1)
+	config.task_fn = lambda : TaskMap[task_name](frame_skip=1, max_steps=mstep)
 	config.task_name = config.task_fn().name
 	config.eval_env = config.task_fn()
 	config.optimizer_fn = lambda params: torch.optim.RMSprop(params, lr=3e-4)
@@ -118,6 +120,10 @@ def a2c_continuous():
 		print(e)
 	run_steps(my_agent)
 
+def run_rl():
+	task_name = "CutCarrot"
+	max_steps = 50
+	ddpg_pixel(task_name, max_steps)
 
 if __name__ == "__main__":
-	a2c_continuous()
+	run_rl()

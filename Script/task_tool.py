@@ -42,14 +42,14 @@ class CutCarrot():
 	def reset(self):
 		self.steps = 0
 		if self.env == None:
-			self.env = DiscreteAgent(self.init_state)
+			self.env = DiscreteAgent(self.init_state, "ToolUse")
 			data = self.env.start()
 		else:
 			print("reset")
 			data = self.env.reset()
 		
 		state = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		state = state.float()
+		state = state.float().cuda()
 		del data
 
 		return state
@@ -60,9 +60,9 @@ class CutCarrot():
 	def step(self, a):
 		action = "ControlRightHand"
 		a.resize((7))
-		data = self.env.step(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Knife", grab_comp="StaticMeshComponent0")
+		data = self.env.step_tool(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Knife", grab_comp="StaticMeshComponent0")
 		next_states = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		next_states = next_states.float()
+		next_states = next_states.float().cuda()
 
 		reward = data['reward']
 		done = data['done']
@@ -110,14 +110,14 @@ class PourWater():
 	def reset(self):
 		self.steps = 0
 		if self.env == None:
-			self.env = DiscreteAgent(self.init_state)
+			self.env = DiscreteAgent(self.init_state, "ToolUse")
 			data = self.env.start()
 		else:
 			print("reset")
 			data = self.env.reset()
 		
 		state = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		state = state.float()
+		state = state.float().cuda()
 		del data
 
 		return state
@@ -128,9 +128,9 @@ class PourWater():
 	def step(self, a):
 		action = "ControlRightHand"
 		a.resize((7))
-		data = self.env.step(action, scale=10, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Cup2", grab_comp="ContainerMesh")
+		data = self.env.step_tool(action, scale=10, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Cup2", grab_comp="ContainerMesh")
 		next_states = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		next_states = next_states.float()
+		next_states = next_states.float().cuda()
 
 		reward = data['reward']
 		done = data['done']
@@ -178,14 +178,14 @@ class GetWater():
 	def reset(self):
 		self.steps = 0
 		if self.env == None:
-			self.env = DiscreteAgent(self.init_state)
+			self.env = DiscreteAgent(self.init_state, "ToolUse")
 			data = self.env.start()
 		else:
 			print("reset")
 			data = self.env.reset()
 		
 		state = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		state = state.float()
+		state = state.float().cuda()
 		del data
 
 		return state
@@ -196,9 +196,9 @@ class GetWater():
 	def step(self, a):
 		action = "ControlRightHand"
 		a.resize((7))
-		data = self.env.step(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Cup3", grab_comp="ContainerMesh")
+		data = self.env.step_tool(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Cup3", grab_comp="ContainerMesh")
 		next_states = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		next_states = next_states.float()
+		next_states = next_states.float().cuda()
 
 		reward = data['reward']
 		done = data['done']
@@ -246,14 +246,14 @@ class OpenCan():
 	def reset(self):
 		self.steps = 0
 		if self.env == None:
-			self.env = DiscreteAgent(self.init_state)
+			self.env = DiscreteAgent(self.init_state, "ToolUse")
 			data = self.env.start()
 		else:
 			print("reset")
 			data = self.env.reset()
 		
 		state = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		state = state.float()
+		state = state.float().cuda()
 		del data
 
 		return state
@@ -264,9 +264,9 @@ class OpenCan():
 	def step(self, a):
 		action = "ControlRightHand"
 		a.resize((7))
-		data = self.env.step(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="CanOpener", grab_comp="StaticMeshComponent0")
+		data = self.env.step_tool(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="CanOpener", grab_comp="StaticMeshComponent0")
 		next_states = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		next_states = next_states.float()
+		next_states = next_states.float().cuda()
 
 		reward = data['reward']
 		done = data['done']
@@ -314,14 +314,14 @@ class PeelKiwi():
 	def reset(self):
 		self.steps = 0
 		if self.env == None:
-			self.env = DiscreteAgent(self.init_state)
+			self.env = DiscreteAgent(self.init_state, "ToolUse")
 			data = self.env.start()
 		else:
 			print("reset")
 			data = self.env.reset()
 		
 		state = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		state = state.float()
+		state = state.float().cuda()
 		del data
 
 		return state
@@ -332,9 +332,9 @@ class PeelKiwi():
 	def step(self, a):
 		action = "ControlRightHand"
 		a.resize((7))
-		data = self.env.step(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Peeler", grab_comp="StaticMeshComponent0")
+		data = self.env.step_tool(action, scale=30, loc=a[0:3], rot=a[3:6], grab_strength=a[6], grab_actor="Peeler", grab_comp="StaticMeshComponent0")
 		next_states = torch.from_numpy(np.moveaxis(data['rgb'], -1, 0))
-		next_states = next_states.float()
+		next_states = next_states.float().cuda().cuda()
 
 		reward = data['reward']
 		done = data['done']
@@ -345,4 +345,5 @@ class PeelKiwi():
 
 		if done:
 			next_states = self.reset()
+
 		return next_states, reward, done, info

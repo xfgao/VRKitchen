@@ -1,4 +1,3 @@
-#!/usr/bin/python2.7
 import sys, math, copy, time, subprocess, os
 import numpy as np
 from io import BytesIO
@@ -7,13 +6,14 @@ from socketClient import Client
 from socketServer import Server
 from PIL import Image
 import logging
+from tool_pos import tool_pos
 from skimage import color, transform
 
-SPEED = 20
+SPEED = 50
 
 class DiscreteAgent(object):
 	def __init__(
-			self, init_state,\
+			self, init_state, task_type, \
 			client_endpoint=("127.0.0.1", 10120), \
 			server_endpoint=("127.0.0.1", 10121)):
 		self.client_endpoint = client_endpoint
@@ -27,31 +27,35 @@ class DiscreteAgent(object):
 		self.data = {}
 		self.restart_ue = 100
 		self.init_state = copy.deepcopy(init_state)
-		self.execCmd = "../Binaries/ToolUse/VRInteractPlatform/Binaries/Linux/VRInteractPlatform"
+		self.task_type = task_type
+		self.execCmd = "../Binaries/"+task_type+"/VRInteractPlatform/Binaries/Linux/VRInteractPlatform"
 		self.crouch = False
 		self.p = subprocess.Popen("exec "+self.execCmd, shell=True,\
 			stdin=None, stdout=self.FNULL, stderr=None, close_fds=True)
 
-	def start(self):
+	def start(self, level=0):
 		self.state = copy.deepcopy(self.init_state)
 		self.state_old = copy.deepcopy(self.init_state)
+		if level:
+			self.state['scene'] = level
+			self.state_old['scene'] = level
 		self.frame = 1
 		self.server.listen()
 		self.client.connect()
 		data_frame = self.send_tf()
 		i = 0
 		while data_frame == None and i < self.retry_num:
-			print("sending tf again")
+			# print("sending tf again")
 			data_frame = self.send_tf()
 			i += 1
 
 		self.data = data_frame
 
 		if data_frame == None:
-			self.reset()
+			self.reset(level)
 		return data_frame
 
-	def reset(self):
+	def reset(self, level=0):
 		# if self.epochs % self.restart_ue == 0:
 		# 	if self.p:
 		# 		self.p.kill()
@@ -60,35 +64,54 @@ class DiscreteAgent(object):
 		# else:
 		# 	self.send_tf(reset=True)
 
+		if level:
+			self.state['scene'] = level
+			self.state_old['scene'] = level
 		self.send_tf(reset=True)
 
 		self.stop()
 		self.server = Server(self.server_endpoint)
 		self.client = Client(self.client_endpoint)	
 		self.epochs += 1
-		return self.start()
+		return self.start(level)
 
 	def stop(self):
 		self.server.stop()
-		self.client.disconnect()
+		# self.client.disconnect()
 		# if self.p:
 		# 	self.p.kill()
 		# 	del self.p
 		# 	self.p = None
 
-		if self.server:
-			del self.server
-			self.server = None
+		# if self.server:
+		# 	del self.server
+		# 	self.server = None
 
-		if self.client:
-			del self.client
-			self.client = None
+		# if self.client:
+		# 	del self.client
+		# 	self.client = None
+
+	def pad(self):
+		data_frame = None
+		i = 0
+		self.state['rgb'] = True
+		while data_frame == None and i < self.retry_num:
+			data_frame = self.send_tf()
+			i += 1
+
+		self.state['rgb'] = False
+		self.frame += 1
+		self.data = data_frame
+		return data_frame
+
 
 	def send_tf(self, Name="Agent1", reset=False, world=False, anim_speed=0.0):
 		data = {}
 		data['AgentName'] = Name
 		data['State'] = {}
 		data['reset'] = reset
+		if "scene" in self.state:
+			data['scene'] = self.state['scene']
 
 		if not reset:
 			data['State']["ActorPose"] = \
@@ -164,6 +187,7 @@ class DiscreteAgent(object):
 			data['State']['depth'] = self.state['depth']
 			data['State']['rgb'] = self.state['rgb']
 			data['State']['mask'] = self.state['mask']
+
 			
 			if world:
 				data['State']["RightHandPose"]["RightHandWorldPos"] = self.state["RightHand"]["WorldLoc"]
@@ -185,12 +209,11 @@ class DiscreteAgent(object):
 				self.state["RightHand"]["WorldLoc"] = data['State']["RightHandPose"]["RightHandWorldPos"]
 				self.state["LeftHand"]["WorldLoc"] = data['State']["LeftHandPose"]["LeftHandWorldPos"]
 
-			# print self.state
+			# # print self.state
+
 		msg = dumps(data)
 		msg = msg+"\n"
 		self.client.send(msg.encode())
-		del msg
-		del data
 
 		# if reset, no need to receive feed back
 		if not reset:
@@ -202,6 +225,8 @@ class DiscreteAgent(object):
 
 			return data_recv
 
+
+
 	def receive_msg(self):
 		try:
 			data_frame = {}
@@ -209,7 +234,12 @@ class DiscreteAgent(object):
 			object_head = self.server.getBuffer()
 			assert(object_head == "Objects")
 			object_data = loads(self.server.getBuffer())
-			#print object_data
+			# print object_data
+
+			if self.task_type == "PrepareDish":
+				objectgo_head = self.server.getBuffer()
+				assert(objectgo_head == "ObjectsGo")
+				object_go_data = loads(self.server.getBuffer())
 			
 			if self.state['depth']:
 				depth_head = self.server.getBuffer()
@@ -222,7 +252,6 @@ class DiscreteAgent(object):
 				assert(rgb_head == "RGB")
 				rgb_data = np.load(BytesIO(self.server.getBuffer()))
 				data_frame["rgb"] = rgb_data
-				del rgb_data
 				# rgb_image = Image.fromarray(rgb_data)
 				# rgb_image.show()
 				# rgb_image.close()
@@ -246,6 +275,10 @@ class DiscreteAgent(object):
 			success = (self.server.getBuffer() == "1")
 
 			data_frame["objects"] = object_data
+
+			if self.task_type == "PrepareDish":
+				data_frame["objects_vis"] = object_go_data
+
 			data_frame["frame"] = self.frame
 			data_frame["reward"] = reward
 			data_frame["done"] = done
@@ -254,7 +287,7 @@ class DiscreteAgent(object):
 			return data_frame
 
 		except Exception as e:
-			print(e)
+			# print e
 			return None
 
 	def RelToWorld(self, x, y, z, theta):
@@ -300,8 +333,7 @@ class DiscreteAgent(object):
 			self.state["RightHand"]["Grab"] = True
 			self.state["RightHand"]["ActorName"] = grab_actor
 			self.state["RightHand"]["CompName"] = grab_comp
-
-
+		
 	def Rotate(self, entity, idx, delta=90, scale=1):
 		rot = copy.deepcopy(self.state[entity]["Rot"])
 
@@ -343,8 +375,8 @@ class DiscreteAgent(object):
 			i += 1
 
 	
-		if data_frame == None:
-			print("Connection break. Manual shutdown.") 
+		# if data_frame == None:
+			# print("Connection break. Manual shutdown.") 
 
 		self.frame += 1
 		self.data = data_frame
@@ -373,8 +405,8 @@ class DiscreteAgent(object):
 			data_frame = self.send_tf(world=False)
 			i += 1
 
-		if data_frame == None:
-			print("Connection break. Manual shutdown.") 
+		# if data_frame == None:
+			# print("Connection break. Manual shutdown.") 
 
 		self.frame += 1
 		self.data = data_frame
@@ -395,7 +427,7 @@ class DiscreteAgent(object):
 			loc_now["X"] += move_unit[1]
 			loc_now["Z"] += move_unit[2]
 			
-			# print loc_now
+			# # print loc_now
 
 			data_frame = None
 			i = 0
@@ -403,8 +435,8 @@ class DiscreteAgent(object):
 				data_frame = self.send_tf(anim_speed=anim_speed)
 				i += 1
 
-			if data_frame == None:
-				print("Connection break. Manual shutdown.") 
+			# if data_frame == None:
+				# print("Connection break. Manual shutdown.") 
 
 			self.frame += 1
 			self.data = data_frame
@@ -463,7 +495,7 @@ class DiscreteAgent(object):
 		else:
 			loc_final = self.data["objects"][actor_name][comp_name]["Loc"]
 
-		# print "take time to find closest", time.time()-start_time
+		# # print "take time to find closest", time.time()-start_time
 		
 		return self.MoveToWorld(entity, loc_final, speed)
 
@@ -530,7 +562,7 @@ class DiscreteAgent(object):
 			loc_now["X"] += move_unit[1]
 			loc_now["Z"] += move_unit[2]
 			
-			# print loc_now
+			# # print loc_now
 
 			data_frame = None
 			i = 0
@@ -538,8 +570,8 @@ class DiscreteAgent(object):
 				data_frame = self.send_tf(world=True)
 				i += 1
 
-			if data_frame == None:
-				print("Connection break. Manual shutdown.") 
+			# if data_frame == None:
+				# print("Connection break. Manual shutdown.") 
 
 			self.frame += 1
 			self.data = data_frame
@@ -556,10 +588,10 @@ class DiscreteAgent(object):
 			for key in self.data["objects"][actor_name][comp_name]["Loc"]
 		]
 		loc_final = {"Y": temp[0], "X":temp[1], "Z":temp[2]}
-		# print self.data["objects"][actor_name][comp_name]["Loc"]
-		# print self.data['objects'][grab_actor_name][contact_name]["Loc"]
-		# print self.state[entity]["WorldLoc"] 
-		# print loc_final
+		# # print self.data["objects"][actor_name][comp_name]["Loc"]
+		# # print self.data['objects'][grab_actor_name][contact_name]["Loc"]
+		# # print self.state[entity]["WorldLoc"] 
+		# # print loc_final
 		return self.MoveContactToWorld(entity, loc_final, speed)
 
 	def MoveToWorld(self, entity, loc_final, speed=SPEED):
@@ -579,7 +611,7 @@ class DiscreteAgent(object):
 			loc_now["X"] += move_unit[1]
 			loc_now["Z"] += move_unit[2]
 			
-			# print loc_now
+			# # print loc_now
 
 			data_frame = None
 			i = 0
@@ -587,8 +619,8 @@ class DiscreteAgent(object):
 				data_frame = self.send_tf(world=True)
 				i += 1
 
-			if data_frame == None:
-				print("Connection break. Manual shutdown.") 
+			# if data_frame == None:
+				# print("Connection break. Manual shutdown.") 
 
 			self.frame += 1
 			self.data = data_frame
@@ -636,22 +668,22 @@ class DiscreteAgent(object):
 		return res
 
 	def GoToPos(self, PosName):
+		self.state["Actor"] = copy.deepcopy(tool_pos[self.state["scene"]][PosName]["Actor"])
 		data_frame = None
 		i = 0
 		while data_frame == None and i < self.retry_num:
 			data_frame = self.send_tf()
 			i += 1
 
-		if data_frame == None:
-			print("Go to Pos. Connection break. Manual shutdown.") 
+		# if data_frame == None:
+			# print("Go to Pos. Connection break. Manual shutdown.") 
 
 		self.frame += 1
 		self.data = data_frame
 
 		return data_frame
 
-
-	def step(self, action, world=False, scale=1.0, loc=None, rot=None, grab_strength=None, grab_actor=None, grab_comp=None):
+	def step_tool(self, action, world=False, scale=1.0, loc=None, rot=None, grab_strength=None, grab_actor=None, grab_comp=None):
 		theta = self.state["Actor"]["Rot"]["Yaw"]/180*math.pi
 		x = math.cos(theta)*scale
 		y = math.sin(theta)*scale
@@ -659,21 +691,67 @@ class DiscreteAgent(object):
 		# print x
 		# print y
 		st = time.time()
+		if action == "ControlRightHand":
+			self.ControlRightHand(loc, rot, grab_strength, grab_actor, grab_comp, scale=scale)
+		else:
+			print("Not a valid command")
+
+		data_frame = None
+		i = 0
+		while data_frame == None and i < self.retry_num:
+			data_frame = self.send_tf(world=world)
+			i += 1
+
+		if data_frame == None:
+			print("Connection break. Manual shutdown.") 
+
+		self.frame += 1
+		self.data = data_frame
+
+		self.state["RightHand"]["Grab"] = False
+		self.state["RightHand"]["Release"] = False
+		self.state["LeftHand"]["Grab"] = False
+		self.state["LeftHand"]["Release"] = False
+
+		return data_frame
+
+	def step(self, action, world=False, scale=1.0):
+		theta = self.state["Actor"]["Rot"]["Yaw"]/180*math.pi
+		x = math.cos(theta)*scale
+		y = math.sin(theta)*scale
+		self.state_old = copy.deepcopy(self.state)
+		# # print x
+		# # print y
+		st = time.time()
 		if action == "ActorMoveForward":
 			self.Move("Actor", 0, scale=x)
 			self.Move("Actor", 1, scale=y)
-		elif action == "ControlRightHand":
-			self.ControlRightHand(loc, rot, grab_strength, grab_actor, grab_comp, scale=scale)
+		elif action == "MoveToDoor":
+			self.MoveToObject("RightHand", "door", None, speed=10000, closest=True)
+			self.MoveToNeutral("RightHand", speed=10000)
+			# print "MoveToDoor", time.time()-st
+		elif action == "GrabCup":
+			self.MoveAndGrabObject("RightHand", "Pour", "GrabPoint", speed=10000, \
+				closest=True)
+			# print "GrabCup", time.time()-st
+		elif action == "MoveToCoffeMaker":
+			self.MoveToObject("RightHand", "Coffe", "PlaceForCup", speed=10000, closest=True)
+			self.ReleaseObject("RightHand")
+			self.MoveToNeutral("RightHand", speed=10000)
+			# print "MoveToCoffeMaker", time.time()-st
+		elif action == "OpenCoffeMaker":
+			self.MoveToObject("RightHand", "Coffe", "PowerButton", speed=10000, closest=True)
+			self.MoveToObject("RightHand", "Coffe", "PourCoffeeButton", speed=10000, closest=True)
+			self.MoveToNeutral("RightHand", speed=10000)
+			# print "OpenCoffeMaker", time.time()-st
 		elif action == "MoveToNeutral":
 			self.MoveToNeutral("RightHand", speed=10000)
 		elif action == "Crouch":
 			self.Crouch()
-			print("crouch", time.time()-st)
+			# print "crouch", time.time()-st
 		elif action == "Standup":
 			self.Standup()
-			print("Standup", time.time()-st)
-		elif action == "GrabKnife":
-			self.GrabObject("RightHand", "Knife", "StaticMeshComponent0")
+			# print "Standup", time.time()-st
 		elif action == "ActorMoveBackward":
 			self.Move("Actor", 0, scale=-x)
 			self.Move("Actor", 1, scale=-y)
@@ -748,7 +826,7 @@ class DiscreteAgent(object):
 		elif action == "RightHandRelease":
 			self.state["RightHand"]["Grab"] = False
 		else:
-			print("Not a valid command")
+			print "Not a valid command"
 
 		data_frame = None
 		i = 0
@@ -756,152 +834,12 @@ class DiscreteAgent(object):
 			data_frame = self.send_tf(world=world)
 			i += 1
 
-		if data_frame == None:
-			print("Connection break. Manual shutdown.") 
+		# if data_frame == None:
+			# print("Connection break. Manual shutdown.") 
 
 		self.frame += 1
 		self.data = data_frame
 
-		self.state["RightHand"]["Grab"] = False
-		self.state["RightHand"]["Release"] = False
-		self.state["LeftHand"]["Grab"] = False
-		self.state["LeftHand"]["Release"] = False
-
 		return data_frame
-
-'''
-class BasicVRTask:
-	def __init__(self, max_steps=sys.maxsize, frame_size=84, frame_skip=1, scale=1.0):
-		self.steps = 0
-		self.max_steps = max_steps
-		self.frame_size = frame_size
-		self.frame_skip = frame_skip
-		self.env = None
-		self.scale = scale
-
-	def reset(self):
-		self.steps = 0
-		if self.env == None:
-			self.env = DiscreteAgent(self.start_pose)
-			self.env.start()
-		data = self.env.reset()
-		state = transform.resize(color.rgb2gray(data['rgb']),\
-		 (self.frame_size, self.frame_size), mode='constant')
-		state = np.moveaxis(state, -1, 0)
-		state = np.stack([state for i in range(self.frame_skip)])
-		# state = data["state"]
-		return state
-
-	def normalize_state(self, state):
-		return state
-
-	def step(self, a):
-		action_list = ["RightHandMoveUp", "RightHandMoveRight", "RightHandTwistLeft","GrabKnife"]
-		action = action_list[a]
-
-		next_states = []
-		for i in range(self.frame_skip):
-			# data = self.env.step(action)
-			data = self.env.step(action, scale=self.scale)
-			next_state = transform.resize(color.rgb2gray(data['rgb']),\
-			 (self.frame_size, self.frame_size), mode='constant')
-			next_state = np.moveaxis(next_state, -1, 0)
-			next_states.append(next_state)
-
-		next_states = np.stack(next_states)
-
-		# data = self.env.step(action)
-		# next_states = data["state"]
-
-		reward = data['reward']
-		done = data['done']
-		info = None
-		self.steps += 1
-		done = (done or self.steps >= self.max_steps)
-		# if done:
-			# print "reward", reward
-		return next_states, reward, done, info
-	
-	def set_monitor(self, filename):
-		self.env = Monitor(self.env, filename)
-
-
-class PixelVR(BasicVRTask):
-	success_threshold = 0
-	def __init__(self, init_state, name, scale=1.0, \
-		normalized_state=True, max_steps=30, frame_size=84, frame_skip=1):
-		BasicVRTask.__init__(self, \
-			max_steps, frame_size, frame_skip, scale=scale)
-		self.normalized_state = normalized_state
-		self.action_dim = 12
-		self.name = name
-		self.init_state = init_state
-
-	def normalize_state(self, state):
-		return np.asarray(state) / 255.0
-
-	def start(self):
-		self.env = DiscreteAgent(self.init_state)
-		self.env.start()
-
-def dqn_pixel_vr():
-	config = Config()
-	config.history_length = 1
-	# Opening Cabinet
-	# init_state = {"Name":"Agent1", \
-	# 	"Actor":{"Loc":{"X":-867.0,"Y":340.0,"Z":36.0},\
-	# 		"Rot":{"Pitch":0.0,"Yaw":90.0,"Roll":0.0}}, \
-	# 	"LeftHand":{"Grab": False, "Loc":{"X":65,"Y":-30,"Z":130},\
-	# 		"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},\
-	# 	"RightHand":{"Grab": False, "Loc":{"X":60,"Y":40,"Z":100},\
-	# 		"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},
-	# 	"Head": {"Rot":{"Pitch":-45.0,"Yaw":0.0,"Roll":0.0}}
-	# 	}
-	# Opening a beer bottle
-	init_state = {"Name":"Agent1", \
-		"Actor":{"Loc":{"X":-730.0,"Y":65.0,"Z":36.0},\
-			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}}, \
-		"LeftHand":{"Grab": True, "Loc":{"X":40,"Y":-30,"Z":75},\
-			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},\
-		"RightHand":{"Grab": True, "Loc":{"X":50,"Y":-5,"Z":95},\
-			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},
-		"Head": {"Rot":{"Pitch":-45.0,"Yaw":0.0,"Roll":0.0}}
-		}
-	config.task_fn = lambda: PixelVR(init_state, \
-		name="Cut Carrot", scale=1/2.0, normalized_state=False, \
-		max_steps=30, frame_skip=config.history_length)
-	action_dim = config.task_fn().action_dim
-	config.optimizer_fn = lambda params: torch.optim.Adam(params, 0.0005)
-	# config.optimizer_fn = lambda params: torch.optim.RMSprop(params, lr=0.00005, alpha=0.95, eps=0.01)
-	config.network_fn = lambda: NatureConvNet(config.history_length, action_dim, gpu=0)
-	# config.network_fn = lambda: DuelingNatureConvNet(config.history_length, action_dim)
-	# config.network_fn = lambda: FCNet([12, 256, 256, action_dim])
-	config.policy_fn = lambda: GreedyPolicy(epsilon=1.0, final_step=50000, min_epsilon=0.1)
-	config.replay_fn = lambda: Replay(memory_size=10000, batch_size=32, dtype=np.uint8)
-	config.reward_shift_fn = lambda r: (r)
-	config.discount = 0.99
-	config.target_network_update_freq = 2500
-	config.max_episode_length = 0
-	config.exploration_steps= 0
-	config.logger = Logger('./log', logger)
-	config.test_interval = 50
-	config.test_repetitions = 1
-	config.episode_limit = 10000000
-	config.double_q = True
-	# config.double_q = False
-	run_episodes(DQNAgent(config))
-
-if __name__ == "__main__":
-	# logger.setLevel(logging.INFO)
-	# logger.setLevel(logging.DEBUG)
-	dqn_pixel_vr()
-'''
-	
-
-
-
-
-
  
-
 

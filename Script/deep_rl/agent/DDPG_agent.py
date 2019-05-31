@@ -33,7 +33,7 @@ class DDPGAgent(BaseAgent):
 
     def eval_step(self, state):
         self.config.state_normalizer.set_read_only()
-        state = np.stack([self.config.state_normalizer(state)])
+        state = self.config.state_normalizer(state)
         action = self.network(state)
         self.config.state_normalizer.unset_read_only()
         return to_np(action).flatten()
@@ -44,7 +44,7 @@ class DDPGAgent(BaseAgent):
             self.random_process.reset_states()
             self.state = self.task.reset()
             self.state = config.state_normalizer(self.state)
-        action = self.network(np.stack([self.state]))
+        action = self.network(self.state.unsqueeze(0))
         action = to_np(action).flatten()
         action += self.random_process.sample()
         next_state, reward, done, info = self.task.step(action)
