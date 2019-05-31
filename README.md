@@ -15,7 +15,7 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 ## Getting Started ##
 1. clone the repo
 
-2. download the zip file in release and unzip it into the /Binaries folder.
+2. download the zip file in release (https://github.com/xfgao/VRKitchen/releases) and unzip it into the /Binaries folder.
 
 3. run the Script/example_dish.py and Script/example_tool.py
 
