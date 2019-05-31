@@ -10,6 +10,8 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 * Python 2.7.12
 * PyTorch 0.4.1
 * numpy 1.16.2
+* PIL 5.4.1
+* skimage 0.14.2
 * rapidjson: https://github.com/hhatto/pyrapidjson
 
 ## Getting Started ##
