@@ -35,4 +35,9 @@ pip install -r requirements.txt
 
 3. To reproduce the experiments, run the Script/example_dish.py (for preparing dishes) and Script/example_tool.py (for tool use)
 
+```bash
+python Script/example_dish.py
+python Script/example_tool.py
+```
+
   Have fun!
