@@ -10,5 +10,3 @@ pathlib2==2.3.3
 pyrapidjson==0.5.1
 tensorboardX==1.7
 gym==0.12.5
-PIL==5.4.1
-skimage==0.14.2
