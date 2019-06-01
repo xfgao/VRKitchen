@@ -3,9 +3,11 @@
 VRKitchen is an interactive 3D virtual kitchen environment which provides a platform for training and evaluating various learning and planning algorithms in a variety of cooking tasks. Two kinds of tasks are available:
 
 1. Tool Use: requires an agent to continuously control its hands to make use of a tool.
+
   E.g. cutting a carrot into pieces, peeling a kiwi, pouring water from one cup to another. 
 
 2. Preparing dishes: agents must perform a series of atomic actions in the right order to achieve a compositional goal.
+
   E.g. making fruit juice, beef stew and sandwiches. 
 
 ## Requirements ##
