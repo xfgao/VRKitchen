@@ -26,7 +26,7 @@ pip install -r requirements.txt
 
 - [Download] https://github.com/xfgao/VRKitchen/releases/download/v0.1.0/VRKitchen-v0.1.0.zip
 
-3. To reproduce the experiments, run the Script/example_dish.py (for preparing dishes) and Script/example_tool.py (for tool use)
+3. To reproduce the experiments, run the Script/example_dish.py (for preparing dishes) and Script/example_tool.py (for tool use).
 
 ```bash
 python Script/example_dish.py
