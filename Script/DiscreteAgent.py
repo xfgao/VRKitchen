@@ -28,7 +28,7 @@ class DiscreteAgent(object):
 		self.restart_ue = 100
 		self.init_state = copy.deepcopy(init_state)
 		self.task_type = task_type
-		self.execCmd = "../Binaries/"+task_type+"/VRInteractPlatform/Binaries/Linux/VRInteractPlatform"
+		self.execCmd = "./Binaries/"+task_type+"/VRInteractPlatform/Binaries/Linux/VRInteractPlatform"
 		self.crouch = False
 		self.p = subprocess.Popen("exec "+self.execCmd, shell=True,\
 			stdin=None, stdout=self.FNULL, stderr=None, close_fds=True)
