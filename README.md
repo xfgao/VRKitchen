@@ -4,11 +4,11 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 
 1. Tool Use: requires an agent to continuously control its hands to make use of a tool.
 
-  E.g. cutting a carrot into pieces, peeling a kiwi, pouring water from one cup to another. 
+    E.g. cutting a carrot into pieces, peeling a kiwi, pouring water from one cup to another. 
 
 2. Preparing dishes: agents must perform a series of atomic actions in the right order to achieve a compositional goal.
 
-  E.g. making fruit juice, beef stew and sandwiches. 
+    E.g. making fruit juice, beef stew and sandwiches. 
 
 ## Requirements ##
 * OS: Ubuntu 16.04
