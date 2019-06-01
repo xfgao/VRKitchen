@@ -3,23 +3,14 @@
 VRKitchen is an interactive 3D virtual kitchen environment which provides a platform for training and evaluating various learning and planning algorithms in a variety of cooking tasks. Two kinds of tasks are available:
 
 1. Tool Use: requires an agent to continuously control its hands to make use of a tool.
+  E.g. cutting a carrot into pieces, peeling a kiwi, pouring water from one cup to another. 
+
 2. Preparing dishes: agents must perform a series of atomic actions in the right order to achieve a compositional goal.
+  E.g. making fruit juice, beef stew and sandwiches. 
 
 ## Requirements ##
 * OS: Ubuntu 16.04
 * Python 2.7.12
-* numpy==1.16.2
-* torch==0.4.1
-* pillow==5.4.1
-* scikit-image==0.14.2
-* torchvision==0.2.1
-* psutil==3.4.2
-* opencv-python==4.0.0.21
-* tqdm==4.31.1
-* pathlib2==2.3.3
-* pyrapidjson==0.5.1
-* tensorboardX==1.7
-* gym==0.12.5
 
 ## Getting Started ##
 1. Clone the repo and install the requirements.
