@@ -20,21 +20,19 @@ VRKitchen is an interactive 3D virtual kitchen environment which provides a plat
 * pyrapidjson==0.5.1
 * tensorboardX==1.7
 * gym==0.12.5
-* PIL==5.4.1
-* skimage==0.14.2
 
 ## Getting Started ##
-1. clone the repo and install the requirements
+1. Clone the repo and install the requirements.
 
 ```bash
 git clone https://github.com/xfgao/VRKitchen.git
 pip install -r requirements.txt
 ```
 
-2. download the zip file and unzip it into the /Binaries folder.
+2. Download the zip file and unzip it into the /Binaries folder.
 
 - [Download] https://github.com/xfgao/VRKitchen/releases/download/v0.1.0/VRKitchen-v0.1.0.zip
 
-3. run the Script/example_dish.py and Script/example_tool.py
+3. To reproduce the experiments, run the Script/example_dish.py (for preparing dishes) and Script/example_tool.py (for tool use)
 
   Have fun!
