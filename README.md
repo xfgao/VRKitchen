@@ -34,3 +34,20 @@ python Script/example_tool.py
 ```
 
   Have fun!
+  
+## Citation ##
+```bash
+@article{VRKitchen,
+  author    = {Xiaofeng Gao and
+               Ran Gong and
+               Tianmin Shu and
+               Xu Xie and
+               Shu Wang and
+               Song{-}Chun Zhu},
+  title     = {VRKitchen: an Interactive 3D Virtual Environment for Task-oriented
+               Learning},
+  journal   = {arXiv},
+  volume    = {abs/1903.05757},
+  year      = {2019},
+}
+```
