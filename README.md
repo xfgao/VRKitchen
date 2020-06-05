@@ -17,7 +17,7 @@ This branch impelements the functionality of using a webpage-based user interfac
 ```
 python Script/interface.py
 ```
-2. Run the executable that contains the VRKitchen platform, press "\`" to release your mouse from the game: 
+2. Run the executable that contains the VRKitchen platform, press \` to release your mouse from the game: 
 ```
 Binaries/WindowsNoEditor/VRInteractPlatform.exe
 ```
