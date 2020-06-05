@@ -292,6 +292,8 @@ class DiscreteAgent(object):
 			data_frame["done"] = done
 			data_frame["success"] = success
 
+			for key in data_frame["objects"]:
+				print("objects: ", key)
 			return data_frame
 
 		except Exception as e:

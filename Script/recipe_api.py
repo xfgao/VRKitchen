@@ -12,7 +12,7 @@ class recipe(object):
 		self.PosList = ["Orig", "Grater", "Sauce", "Knife", "Peeler", "Juicer",
 					"Oven", "Stove", "Fridge"]
 
-		self.LeftHandList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "Cheese", "Cheese_sliced", "Dough", "Onion", "Potato"]
+		self.LeftHandList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "cheese", "Cheese_sliced", "Dough", "Onion", "Potato"]
 		self.StaticMeshList = ["BreadBP", "Dough", "Cheese_sliced"]
 		self.CenterList = ["BreadBP", "Dough"]
 		self.BoxTwoList = []
@@ -24,7 +24,7 @@ class recipe(object):
 		"Grater"]
 		self.OpenList = ["FridgeDoorDown", "Stove"]
 
-		self.IngredList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "Onion", "Cheese", "Cheese_sliced", "Dough", \
+		self.IngredList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "Onion", "cheese", "Cheese_sliced", "Dough", \
 			"Beef", "Chicken", "BreadBP", "Lemon", "Mango", "Kiwi", "Peach", "Apple", "Orange", "Ham", "Turkey", \
 			"Salami", "Potato"]
 		self.ContList = ["Fridge", "Plate", "Plate2", "Hand", "BreadBP", "Dough", "Pot", "Board", "Cup","SauceBottle"]
@@ -32,7 +32,7 @@ class recipe(object):
 			"Peach", "Apple", "Orange"]
 		self.PeelableList = ["Apple", "Cucumber", "Kiwi", "Mango", "Orange", "Peach", "Potato"]
 		self.JuiceList = ["Cucumber", "Tomato", "Apple", "Kiwi", "Mango", "Orange", "Peach", "Lemon"]
-		self.GratableList = ["Cheese"]
+		self.GratableList = ["cheese"]
 
 		self.env = DiscreteAgent({"Name":"Agent1", \
 					"Actor":{"Loc":{"X":0,"Y":0,"Z":0},\
@@ -432,8 +432,8 @@ class recipe(object):
 			self.a = self.env.MoveToObject("RightHand", "FridgeDoorDown", "Box")
 			self.a = self.env.MoveToNeutral("RightHand")
 		elif tool == "Stove":
-			self.a = self.env.MoveToObject("LeftHand","Stove","Switch")
-			self.a = self.env.MoveToObject("LeftHand","Stove","Switch")
+			self.a = self.env.MoveToObject("LeftHand","Stove","switch")
+			self.a = self.env.MoveToObject("LeftHand","Stove","switch")
 			self.a = self.env.MoveToNeutral("LeftHand")
 			for thing in self.ObjDict:
 				if self.ObjDict[thing]['Pos'] == "Pot":
