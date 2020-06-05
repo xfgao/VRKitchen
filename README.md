@@ -8,7 +8,7 @@ This branch impelements the functionality of using a webpage-based user interfac
 1. git clone -b webApiExecutable https://github.com/xfgao/VRKitchen.git
 2. pip install -r requirements.txt
 3. Download the zip file and unzip it into the /Binaries folder:
-[Download] https://github.com/xfgao/VRKitchen/releases/download/v0.1.0/VRKitchen-v0.1.0.zip
+[Download] https://drive.google.com/file/d/1ceQDni1gzyzc2OcQ3foaejTsqkmqw71B/view?usp=sharing
 
 
 **To collect demonstrations:**
