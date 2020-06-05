@@ -17,6 +17,6 @@ This branch impelements the functionality of using a webpage-based user interfac
 ```
 python Script/interface.py
 ```
-2. Run the executable that contains the VRKitchen platform
+2. Run the executable that contains the VRKitchen platform: Binaries/WindowsNoEditor/VRInteractPlatform.exe
 3. Go to http://127.0.0.2:9000/ in your browser and you are good to go
 4. Your demonstrations would be saved in the folder: Script/dataset
