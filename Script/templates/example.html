@@ -1,0 +1,137 @@
+{% extends "base.html" %}
+{% block id %} {{id}} {% endblock %}
+
+{% block top %}  
+<div class="text-center">
+
+	 <h1>{{title}}</h2>
+	 <h2>{{action}}</h1>
+	 	{% if  train %}
+	<h3 id="phase"> Training Phase: Don't worry about it if you cannot get everything correct.</h1>
+	{% else %}
+	<h3 id="phase"> Testing Phase: Please pay close attention</h1>
+	{% endif %}
+
+	 <p>As two separate modules, you know that they go wrong at a different, unknown probability and the probability does not change.
+	 	<br><b>which means one module went wrong does not lead to errors in other modules </b></p>
+</div>
+{% endblock %}
+
+{% block left %} 
+<div class="text-center">
+	<figure>
+		<img src="static/img/{{img}}"  height="200" width="200"/>
+		<figcaption>{{imgtitle}}</figcaption>
+	</figure>
+
+
+<h3> Explanation: </h3>
+<h4>State (vision module output):</h4>
+ {{exp1}}
+
+<h4>Task plan (planning module output): </h4>
+ {{exp2}}
+</div>
+
+{% endblock %}
+
+{% block right %}
+<form action = "/test", method="POST", id = "questions">
+<STRONG>Question 1</STRONG>: Do you think the robot's vision module is working fine?
+<INPUT TYPE="radio" NAME="q1" VALUE="y">Yes
+<INPUT TYPE="radio" NAME="q1" VALUE="n">No
+<br>
+
+<STRONG>Question 2</STRONG>: Do you think the robot's task plan is right?
+<INPUT TYPE="radio" NAME="q2" VALUE="y">Yes
+<INPUT TYPE="radio" NAME="q2" VALUE="n">No
+<br>
+<INPUT TYPE='hidden' NAME='next_i' VALUE={{next_i}}>
+<INPUT TYPE='hidden' NAME='next_j' VALUE={{next_j}}>
+<INPUT TYPE='hidden' NAME='idnum' VALUE={{idnum}}>
+	{% if  train %}
+  	<button id = "show">Show Solution</button>
+  	{% else %}
+  	<button id = "show">next question</button>
+  	{% endif %}
+
+ 	
+</form>
+<p id = "sol"> </p>
+	
+<div id= "error"> </div>
+
+{% endblock %} 
+
+{% block bot %}
+<div class = "text-center">
+	<form action="/hints" method="POST" target="_blank">
+		<input type="submit" value="hints">
+	</form>
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+function getCookie(cname) {
+    var name = cname + "=";
+    var ca = document.cookie.split(';');
+    for(var i = 0; i < ca.length; i++) {
+        var c = ca[i];
+        while (c.charAt(0) == ' ') {
+            c = c.substring(1);
+        }
+        if (c.indexOf(name) == 0) {
+            return c.substring(name.length, c.length);
+        }
+    }
+    return "";
+}
+
+$(document).ready(function () {
+
+	$("#show" ).click( function(event){
+		event.preventDefault();
+		
+	
+
+		if("{{train}}" == "True")
+		$("#sol").empty().append(
+			`
+			 <b>Solution for Question 1</b> <br>
+			{{ans1}} <br>
+			 <b>Solution for Question</b> 2 <br>
+			{{ans2}} <br>
+			<form action='/example', method = 'POST'>
+			<INPUT TYPE='hidden' NAME='next_i' VALUE={{next_i}}>
+			<INPUT TYPE='hidden' NAME='next_j' VALUE={{next_j}}>
+			<INPUT TYPE='hidden' NAME='idnum' VALUE={{idnum}}>
+			<input type='submit' value='next question'>
+			</form>
+			`)
+		else
+		{
+			if( ! $("input[name=q1]").is(':checked') || ! $("input[name=q2]").is(':checked') )
+				$("#error").empty().append("Please complete the form before submit"); 
+
+			//('input[name=q1]:checked', '#questions').val()
+			
+			else
+    		{
+    			$("#questions").submit();
+    		}
+
+
+		}
+	});
+
+
+	if("{{train}}" == "False")
+	{
+		
+	}
+
+});
+</script>
+
+{% endblock %} 

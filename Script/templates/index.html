@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+
+{% block top %}
+<div class="row">
+	<div class = 'col-sm-3'>  
+		<p><b> Scene ID : </b> {{level}}</p> 
+		<p><b> task : </b> {{task}}</p>
+		<p><b> Current Location : </b> {{loc}}</p>
+	</div> <!--left column of the grid -->
+
+	<div class="col-sm-6">
+		<div class="text-center">
+			<h2> Notice: You can only grab one thing at a time. </h2>
+		</div>
+	</div> <!--mid 8 columns of the grid -->
+
+	<div class = 'col-sm-3'>  
+		<p> <b> Instructions: </b> </p>
+		<ul>
+			<li> Choose a scene id </li>
+			<li> Choose a task </li>
+			<li> Watch the video </li>
+			<li> Click start button to start </li>
+			<li> Perform action to finish the task (current state == goal state) </li>
+			<li> Click end button to finsh the task </li>
+		</ul>
+	</div> <!--right column of the grid -->
+
+</div> <!--class row -->
+
+<div class = "text-center">
+<form action="/start" method="POST">
+	<input type="submit" value="Start">
+</form> 
+</div>
+<br>
+
+<div class = "text-center">
+<form action="/end" method="POST">
+	<input type="submit" value="End" >
+</form> 
+</div>
+<br>
+
+<div class = "text-center">
+<form action="/level" method="POST">
+	<b> Scene id: </b> 
+	<input type="submit" name = "level" value="2" >
+	<input type="submit" name = "level" value="3" >
+	<input type="submit" name = "level" value="5" >
+	<input type="submit" name = "level" value="6" >
+</form> 
+</div>
+<br>
+
+<div class="text-center">
+	<form action = "/" method="POST">
+		<b> Tasks: </b>
+		<input type="submit" name="task" value="peel fruit">
+		<input type="submit" name="task" value="cut fruit">
+		<input type="submit" name="task" value="make juice">
+		<input type="submit" name="task" value="cook meat">
+		<input type="submit" name="task" value="cook soup">
+		<input type="submit" name="task" value="make sandwich">
+		<input type="submit" name="task" value="make pizza">
+	</form>
+</div>
+
+<div class="row">
+	<div class="col-sm-2">
+	</div>
+	<div class="col-sm-8">
+		<div class="text-center" id=ingredients-list>
+			<b>ingredient list: </b> 
+			{% for item in ingredients %}
+				{{item}}, 
+			{% endfor %}
+			<br>
+
+			<p> <font color="red"> {{msg}} </font></p>
+			<br>
+			{% if active == true %}
+			<p><b>Current state: </b>  {{state}} </p>
+			
+			<p><font color="green"><b>Goal State: </b> {{goal}} </font></p>
+			{% endif %}
+			{% if done == true %}
+			<p> <font color = "green"> Thank you, you are done. Please end the task! </font> </p>
+			{% endif %}
+
+		</div>
+	</div>
+</div>
+
+
+{% endblock %} 
+
+
+
+{% block goto %}
+
+{% if (active == true) %}
+<div class = "text-center box-action">
+	<p> Action: Go to: </p>
+<form action="/" method="POST" >
+	{% for item in goto %}
+		<input type="submit" name="goto" value="{{item}}">
+	{% endfor %}
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+
+{% block take %}
+{% if active == true %}
+<div class = "text-center box-action">
+	<p> Action: Take: </p>
+<form action="/" method="POST" >
+	{% for item in take %}
+		<input type="submit" name="take" value="{{item}}">
+	{% endfor %}
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+{% block placeto %}
+{% if active == true %}
+<div class = "text-center box-action">
+	<p> Action: Place To: </p>
+<form action="/" method="POST" >
+	{% for item in placeto %}
+		<input type="submit" name="placeto" value="{{item}}">
+	{% endfor %}
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+
+{% block use %}
+{% if active == true %}
+<div class = "text-center box-action">
+	<p> Action: Use: </p>
+<form action="/" method="POST" >
+	{% for item in use %}
+		<input type="submit" name="use" value="{{item}}">
+	{% endfor %}
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+
+{% block open %}
+{% if active == true %}
+<div class = "text-center box-action">
+	<p> Action: Open: </p>
+<form action="/" method="POST" >
+	{% for item in open %}
+		<input type="submit" name="open" value="{{item}}">
+	{% endfor %}
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+{% block head %}
+{% if active == true %}
+<div class = "text-center box-action">
+	<p> Action: Move Head: </p>
+<form action="/" method="POST" >
+		<input type="submit" name="head" value="look up">
+		<input type="submit" name="head" value="look down">
+</form> 
+</div>
+<br>
+{% endif %}
+{% endblock %}
+
+
+{% block  bot%}
+{% if active == false %}
+<div class="text-center">
+<video width="640" height="480" controls>
+  <source src="static/videos/{{vid}}" type="video/mp4">
+</video>
+</div>
+{% endif %}
+{% endblock %}
+
+
+  {% block script %}
+  <script type="text/javascript">
+ $(document).ready(function() {
+ var url = "static/img/temp.jpg?rnd="+Math.random();
+ $('#main').attr('src',url);
+ });
+ </script> 
+ {% endblock %}

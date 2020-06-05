@@ -90,14 +90,13 @@ class Server(object):
 
 
 	def stop(self):
-		del self.buf
-		self.buf = ""
 		self.listener.close()
 		self.listener = None
 		if not self.conn:
 			return False
 		self.conn.close()
 		self.conn = None
+		self.buf = None
 		return True
 
 
