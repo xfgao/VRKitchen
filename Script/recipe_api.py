@@ -21,7 +21,7 @@ class recipe(object):
 		self.ContainerMesh = ["Pot"]
 
 		self.UseList = ["Peeler", "Knife", "Juicer", "Cup", "Oven", "SauceBottle",
-		"Grater"]
+		"grater"]
 		self.OpenList = ["FridgeDoorDown", "Stove"]
 
 		self.IngredList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "Onion", "cheese", "Cheese_sliced", "Dough", \
@@ -249,6 +249,7 @@ class recipe(object):
 			comp_in_hand = ""
 
 		if not tool == "Oven" and tool not in self.env.data["objects"]:
+			print(tool)
 			return "not near the tool"+ tool
 			 
 
@@ -293,15 +294,15 @@ class recipe(object):
 			if actor_in_hand in self.PeelableList:
 				self.ObjDict[actor_in_hand]["Peel"] = True
 
-		elif tool == "Grater":
+		elif tool == "grater":
 			if hand == "RightHand":
 				return "RightHand not empty"
 				 
 			if not hand:
 				return "nothing to grate"
 				 
-			self.a = self.env.MoveToObject("RightHand", "Grater", "grabpoint")
-			self.a = self.env.GrabObject("RightHand", "Grater", "StaticMeshComponent0")
+			self.a = self.env.MoveToObject("RightHand", "grater", "grabpoint")
+			self.a = self.env.GrabObject("RightHand", "grater", "StaticMeshComponent0")
 			self.a = self.env.MoveToNeutral("RightHand")
 			self.a = self.env.MoveContactToObject("RightHand", "StaticMeshComponent0", actor_in_hand, "ProcMesh")
 			self.a = self.env.MoveToNeutral("RightHand")

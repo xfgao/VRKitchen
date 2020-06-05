@@ -394,7 +394,7 @@ def index():
 	if "Grater" in tool and (r.env.state["Actor"]["Loc"] == tool["Grater"]["Actor"]["Loc"] and
 		(r.env.state["LeftHand"]["ActorName"] in r.GratableList  or 
 		r.env.state["RightHand"]["ActorName"] in r.GratableList )):
-		temp.add("Grater")
+		temp.add("grater")
 
 	if (r.env.state["Actor"]["Loc"] == tool["Oven"]["Actor"]["Loc"]):
 		temp.add("Oven")
