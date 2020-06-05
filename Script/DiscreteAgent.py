@@ -661,7 +661,7 @@ class DiscreteAgent(object):
 		self.MoveToObject(entity1, opener_name, "StaticMeshComponent0", speed)
 		self.GrabObject(entity1, opener_name, "StaticMeshComponent0")
 		self.MoveToNeutral(entity1, speed)
-		self.MoveToObject(entity2, bottle_name, "GrabPoint", speed)
+		self.MoveToObject(entity2, bottle_name, "grabpoint", speed)
 		self.GrabObject(entity2, bottle_name, "ContainerMesh")
 		self.MoveToNeutral(entity2, speed)
 		self.MoveContactToObject(entity1, "Box", bottle_name, "Box", speed)
@@ -669,7 +669,7 @@ class DiscreteAgent(object):
 		return res
 
 	def ToastBread(self, entity, bread_name, toaster_name, speed=5):
-		self.MoveToObject(entity, bread_name, "GrabPoint", speed)
+		self.MoveToObject(entity, bread_name, "grabpoint", speed)
 		self.GrabObject(entity, bread_name, "StaticMeshComponent0")
 		self.MoveToNeutral(entity, speed)
 		self.step(entity+"RotateUp", scale=5)
@@ -711,7 +711,7 @@ class DiscreteAgent(object):
 			self.MoveToNeutral("RightHand", speed=10000)
 			print "MoveToDoor", time.time()-st
 		elif action == "GrabCup":
-			self.MoveAndGrabObject("RightHand", "Pour", "GrabPoint", speed=10000, \
+			self.MoveAndGrabObject("RightHand", "Pour", "grabpoint", speed=10000, \
 				closest=True)
 			print "GrabCup", time.time()-st
 		elif action == "MoveToCoffeMaker":

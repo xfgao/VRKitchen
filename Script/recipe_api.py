@@ -253,7 +253,7 @@ class recipe(object):
 			self.a = self.env.MoveContactToObject(hand, "ProcMesh", "Board", "Box")
 			self.a = self.env.ReleaseObject(hand)
 			self.a = self.env.MoveToNeutral(hand) 
-			self.a = self.env.MoveToObject("RightHand", "Knife", "GrabPoint")
+			self.a = self.env.MoveToObject("RightHand", "Knife", "grabpoint")
 			self.a = self.env.GrabObject("RightHand", "Knife", "StaticMeshComponent0")
 			self.a = self.env.MoveToNeutral("RightHand")
 			self.a = self.env.step("RightHandTwistLeft", scale=5)
@@ -262,7 +262,7 @@ class recipe(object):
 			self.a = self.env.step("RightHandMoveUp", scale=2)
 			self.a = self.env.MoveToNeutral("RightHand")
 			self.a = self.env.step("RightHandTwistRight", scale=5)
-			self.a = self.env.MoveContactToObject("RightHand", "GrabPoint", "282Main_18", "Box")
+			self.a = self.env.MoveContactToObject("RightHand", "grabpoint", "282Main_18", "Box")
 			self.a = self.env.ReleaseObject("RightHand")
 			self.a = self.env.MoveToNeutral("RightHand")
 			self.ObjDict[actor_in_hand]["Pos"] = "Board"
@@ -346,7 +346,7 @@ class recipe(object):
 			if hand == "LeftHand":
 				return "LeftHand not empty"
 				
-			self.a = self.env.MoveToObject("LeftHand", "Cup", "GrabPoint")
+			self.a = self.env.MoveToObject("LeftHand", "Cup", "grabpoint")
 			self.a = self.env.GrabObject("LeftHand", "Cup", "ContainerMesh")
 			self.a = self.env.MoveToNeutral("LeftHand")
 			self.a = self.env.GoToPos("Stove")
