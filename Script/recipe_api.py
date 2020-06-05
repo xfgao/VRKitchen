@@ -22,7 +22,7 @@ class recipe(object):
 
 		self.UseList = ["Peeler", "Knife", "Juicer", "Cup", "Oven", "SauceBottle",
 		"Grater"]
-		self.OpenList = ["fridgeDoorDown", "Stove"]
+		self.OpenList = ["FridgeDoorDown", "Stove"]
 
 		self.IngredList = ["Lettuce", "Tomato", "Cucumber", "Eggplant", "Onion", "Cheese", "Cheese_sliced", "Dough", \
 			"Beef", "Chicken", "BreadBP", "Lemon", "Mango", "Kiwi", "Peach", "Apple", "Orange", "Ham", "Turkey", \
@@ -423,7 +423,7 @@ class recipe(object):
 			hand = ""
 
 		if tool == "Fridge":
-			self.a = self.env.MoveToObject("RightHand", "fridgeDoorDown", "Box")
+			self.a = self.env.MoveToObject("RightHand", "FridgeDoorDown", "Box")
 			self.a = self.env.MoveToNeutral("RightHand")
 		elif tool == "Stove":
 			self.a = self.env.MoveToObject("LeftHand","Stove","Switch")
