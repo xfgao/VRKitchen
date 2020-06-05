@@ -142,7 +142,7 @@ def start():
 		(temp2, {'Cook': 'True', 'Pos': 'BreadBP'})])
 
 	elif task == "make pizza":
-		ingredients = ['Dough', 'Sauce','Cheese']
+		ingredients = ['Dough', 'Sauce','cheese']
 		vegs = ["Cucumber", "Tomato", "Eggplant", "Onion"]
 		coldcuts = ["Salami", "Ham", "Turkey"]
 		temp1 = np.random.choice(vegs)
@@ -153,7 +153,7 @@ def start():
 
 		goal_state =  sorted([('Dough', {'Cook': 'True','Pos': 'Plate2'}), 
 		('Sauce', {'Cook': 'True','Pos': 'Dough'}), 
-		('Cheese', {'Cook': 'True', 'Pos': 'Dough'}), 
+		('cheese', {'Cook': 'True', 'Pos': 'Dough'}), 
 		(temp1, {'Cook': 'True', 'Cut': 'True', 'Pos': 'Dough'}), 
 		(temp2, {'Cook': 'True', 'Pos': 'Dough'})])
 
