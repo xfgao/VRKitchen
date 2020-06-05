@@ -429,7 +429,8 @@ def index():
 		done = True	
 		r.RecordSuccess(f_label = f_label)
 
-	
+	if msg == "Success":
+		msg = None
 	return render_template("index.html", goto=sorted(goto), take = sorted(take), placeto = sorted(placeto), use=sorted(use), 
 		open = sorted(openn), msg = msg, ingredients = sorted(ingredients), level = level, 
 		task = task, active = active, loc = loc, state= sorted(state), goal = goal_state, done = done,vid=vid )
