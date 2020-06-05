@@ -96,6 +96,12 @@ class recipe(object):
 			f_fluent.write(str(self.ObjDict))
 			f_fluent.write("\n")
 		return "Success"
+		
+	def RecordSuccess(self,f_label=""):
+		if f_label:
+			f_label.write("finshed the task")
+			
+
 
 	def Take(self,obj, folder_name="", count=[0], f_label="", f_fluent=""):
 		# TODO: add constraint that one hand can take things at a time

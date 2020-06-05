@@ -427,6 +427,7 @@ def index():
 
 	if cmp(sorted(state), sorted(goal_state) )==0 and active == True:
 		done = True	
+		r.RecordSuccess(f_label = f_label)
 
 	
 	return render_template("index.html", goto=sorted(goto), take = sorted(take), placeto = sorted(placeto), use=sorted(use), 
