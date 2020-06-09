@@ -13,6 +13,7 @@ conda env create -f environment.yml
 conda activate kitchen_env
 pip install pyrapidjson
 ```
+- If you get error message saying "Microsoft Visual C++ 9.0 is required", download Microsoft Visual C++ for Python 2.7 from here https://www.microsoft.com/en-us/download/details.aspx?id=44266, install it, and run the pip command again
 3. Download the zip file and unzip it into the /Binaries folder:
 [Download] https://drive.google.com/file/d/1kwn-DkoPHyQC2iTcXkizLGSi7chUbdYs/view?usp=sharing
 
