@@ -198,6 +198,12 @@ class recipe(object):
 		else:
 			comp_place = "StaticMeshComponent0"
 
+		if obj == "Fridge":
+ 			comp_place = "fridgeInitialBox"
+ 			obj = actor_in_hand
+ 			self.ObjDict[actor_in_hand]["Pos"] = "Fridge"
+		
+
 		self.a = self.env.MoveContactToObject(hand, comp, obj, comp_place)
 		self.a = self.env.ReleaseObject(hand)
 		self.a = self.env.MoveToNeutral(hand)

@@ -300,6 +300,18 @@ def index():
 
 	##################### place to
 	temp = set()
+
+	if "Fridge" in tool and r.env.state["Actor"]["Loc"] == tool["Fridge"]["Actor"]["Loc"] and (r.env.state["LeftHand"]["ActorName"]  or 
+ 		r.env.state["RightHand"]["ActorName"]):
+		if r.env.state["LeftHand"]["ActorName"] : 
+			obj = r.env.state["LeftHand"]["ActorName"]
+		else:
+			obj = r.env.state["RightHand"]["ActorName"]
+		if obj == "BreadBP" or obj == "Cheese_sliced" or obj == "Dough":
+			pass
+		else:
+ 			temp.add("Fridge")
+
 	if "Sauce" in tool and  r.env.state["Actor"]["Loc"] == tool["Sauce"]["Actor"]["Loc"] and (r.env.state["LeftHand"]["ActorName"]  or 
 		r.env.state["RightHand"]["ActorName"]):
 		temp.add("Plate2")
