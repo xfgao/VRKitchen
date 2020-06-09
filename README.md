@@ -7,7 +7,7 @@ This branch impelements the functionality of using a webpage-based user interfac
 
 **Getting Started:**
 1. git clone -b webApiExecutable https://github.com/xfgao/VRKitchen.git
-2. In your **anaconda prompt**, type:
+2. Under the VRKitchen folder, type the commands in your **anaconda prompt**:
 ```
 conda env create -f environment.yml  
 conda activate kitchen_env
