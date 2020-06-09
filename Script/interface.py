@@ -158,9 +158,9 @@ def start():
 		(temp2, {'Cook': 'True', 'Pos': 'Dough'})])
 
 	try:
-	    os.makedirs(folder_name)
+		os.makedirs(folder_name)
 	except:
-	    print "folder exist"
+		print "folder exist"
 
 	try:
 		f_label = open(folder_name+"/action_label.txt", "w")
@@ -439,5 +439,5 @@ def index():
 
 
 if __name__ == '__main__':
-    app.run(host='127.0.0.2', port = 9000)
-    
+	app.run(host='127.0.0.2', port = 9000)
+	
