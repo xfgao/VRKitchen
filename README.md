@@ -27,6 +27,6 @@ python Script/interface.py
 ```
 Binaries/WindowsNoEditor/VRInteractPlatform.exe
 ```
-If windows defender gives you a pop-up notice click "more info" then "run anyway"
+* If windows defender gives you a pop-up notice click "more info" then "run anyway"
 3. Go to http://127.0.0.2:9000/ in your browser, you will use the webpage to control your agent.
 4. Your demonstrations would be saved in the folder: Script/dataset. You can zip and send the whole /dataset folder back to us.
