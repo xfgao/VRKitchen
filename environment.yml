@@ -1,0 +1,12 @@
+name: kitchen_env
+dependencies:
+  - python=2.7
+  - pip
+  - numpy
+  - Pillow
+  - scikit-image
+  - scipy
+  - flask
+  - matplotlib
+  - pymongo
+  
