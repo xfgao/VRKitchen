@@ -198,6 +198,15 @@ class recipe(object):
 		else:
 			comp_place = "StaticMeshComponent0"
 
+		if f_label:
+			f_label.write("Placeto ")
+			f_label.write(obj)
+			f_label.write("\n")
+
+		if f_fluent:
+			f_fluent.write(str(self.ObjDict))
+			f_fluent.write("\n")
+
 		if obj == "Fridge":
  			comp_place = "fridgeInitialBox"
 
@@ -238,14 +247,7 @@ class recipe(object):
 		# 		except:
 		# 			pass
 
-		if f_label:
-			f_label.write("Placeto ")
-			f_label.write(obj)
-			f_label.write("\n")
 
-		if f_fluent:
-			f_fluent.write(str(self.ObjDict))
-			f_fluent.write("\n")
 		return "Success"
 
 	def Use(self,tool, folder_name="", count=[0], f_label="", f_fluent=""):
@@ -263,7 +265,6 @@ class recipe(object):
 			comp_in_hand = ""
 
 		if not tool == "Oven" and tool not in self.env.data["objects"]:
-			print(tool)
 			return "not near the tool"+ tool
 			 
 
