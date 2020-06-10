@@ -200,8 +200,16 @@ class recipe(object):
 
 		if obj == "Fridge":
  			comp_place = "fridgeInitialBox"
+
  			obj = actor_in_hand
  			self.ObjDict[actor_in_hand]["Pos"] = "Fridge"
+			if obj == "Dough":
+				obj = "doughBox"
+			elif obj == "Cheese_sliced":
+				obj = "cheese_sliceBox"
+			elif obj == "BreadBP":
+				obj = "breadBox"
+
 		
 
 		self.a = self.env.MoveContactToObject(hand, comp, obj, comp_place)

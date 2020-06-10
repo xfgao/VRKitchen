@@ -286,8 +286,8 @@ class DiscreteAgent(object):
 				data_frame["count"] = count_data			
 
 				
-			print object_data
 			
+
 			data_frame["objects"] = object_data
 			data_frame["frame"] = self.frame
 			data_frame["reward"] = reward
