@@ -445,9 +445,10 @@ class DiscreteAgent(object):
 		move_unit = dif/times
 
 		for i in np.arange(times):
-			loc_now["Y"] += move_unit[0]
-			loc_now["X"] += move_unit[1]
-			loc_now["Z"] += move_unit[2]
+			cnt = 0
+			for key in loc_final:
+				loc_now[key] += move_unit[cnt]
+				cnt += 1
 			
 			# print loc_now
 
@@ -567,7 +568,6 @@ class DiscreteAgent(object):
 		loc = self.state[entity]["NeutralLoc"]
 		x_new, y_new, z_new, _ = self.RelToWorld(loc["X"], loc["Y"], loc["Z"], 0)
 		loc_final = {"X":x_new, "Y":y_new, "Z":z_new}
-		print(loc_final)
 		return self.MoveToWorld(entity, loc_final, speed)		
 
 	def MoveContactToWorld(self, entity, loc_final, speed=SPEED):
@@ -581,10 +581,10 @@ class DiscreteAgent(object):
 		move_unit = dif/times
 
 		for i in np.arange(times):
-			loc_now["Y"] += move_unit[0]
-			loc_now["X"] += move_unit[1]
-			loc_now["Z"] += move_unit[2]
-			
+			cnt = 0
+			for key in loc_final:
+				loc_now[key] += move_unit[cnt]
+				cnt += 1
 			# print loc_now
 
 			data_frame = None
@@ -628,11 +628,11 @@ class DiscreteAgent(object):
 		times = np.ceil(dif_len/speed+eps)
 		move_unit = dif/times
 
-
 		for i in np.arange(times):
-			loc_now["Y"] += move_unit[0]
-			loc_now["X"] += move_unit[1]
-			loc_now["Z"] += move_unit[2]
+			cnt = 0
+			for key in loc_final:
+				loc_now[key] += move_unit[cnt]
+				cnt += 1
 			
 			# print loc_now
 
@@ -834,136 +834,6 @@ class DiscreteAgent(object):
 
 		return data_frame
 
-
-# class BasicVRTask:
-# 	def __init__(self, max_steps=sys.maxsize, frame_size=84, frame_skip=1, scale=1.0):
-# 		self.steps = 0
-# 		self.max_steps = max_steps
-# 		self.frame_size = frame_size
-# 		self.frame_skip = frame_skip
-# 		self.env = None
-# 		self.scale = scale
-
-# 	def reset(self):
-# 		self.steps = 0
-# 		if self.env == None:
-# 			self.env = DiscreteAgent(self.start_pose)
-# 			self.env.start()
-# 		data = self.env.reset()
-# 		state = transform.resize(color.rgb2gray(data['rgb']),\
-# 		 (self.frame_size, self.frame_size), mode='constant')
-# 		state = np.moveaxis(state, -1, 0)
-# 		state = np.stack([state for i in range(self.frame_skip)])
-# 		# state = data["state"]
-# 		return state
-
-# 	def normalize_state(self, state):
-# 		return state
-
-# 	def step(self, a):
-# 		action_list = ["LeftHandMoveForward", "LeftHandMoveBackward",\
-# 			"LeftHandMoveRight", "LeftHandMoveLeft", "LeftHandMoveUp", \
-# 			"LeftHandMoveDown", "LeftHandRotateRight", "LeftHandRotateLeft",\
-# 			"LeftHandRotateUp", "LeftHandRotateDown", "LeftHandTwistRight", \
-# 			"LeftHandTwistLeft"]
-# 		action = action_list[a]
-
-# 		next_states = []
-# 		for i in range(self.frame_skip):
-# 			# data = self.env.step(action)
-# 			data = self.env.step(action, scale=self.scale)
-# 			next_state = transform.resize(color.rgb2gray(data['rgb']),\
-# 			 (self.frame_size, self.frame_size), mode='constant')
-# 			next_state = np.moveaxis(next_state, -1, 0)
-# 			next_states.append(next_state)
-
-# 		next_states = np.stack(next_states)
-
-# 		# data = self.env.step(action)
-# 		# next_states = data["state"]
-
-# 		reward = data['reward']
-# 		done = data['done']
-# 		info = None
-# 		self.steps += 1
-# 		done = (done or self.steps >= self.max_steps)
-# 		# if done:
-# 			# print "reward", reward
-# 		return next_states, reward, done, info
-	
-# 	def set_monitor(self, filename):
-# 		self.env = Monitor(self.env, filename)
-
-
-# class PixelVR(BasicVRTask):
-# 	success_threshold = 0
-# 	def __init__(self, init_state, name, scale=1.0, \
-# 		normalized_state=True, max_steps=50, frame_size=84, frame_skip=1):
-# 		BasicVRTask.__init__(self, \
-# 			max_steps, frame_size, frame_skip, scale=scale)
-# 		self.normalized_state = normalized_state
-# 		self.action_dim = 12
-# 		self.name = name
-# 		self.init_state = init_state
-
-# 	def normalize_state(self, state):
-# 		return np.asarray(state) / 255.0
-
-# 	def start(self):
-# 		self.env = DiscreteAgent(self.init_state)
-# 		self.env.start()
-
-# def dqn_pixel_vr():
-# 	config = Config()
-# 	config.history_length = 1
-# 	# Opening Cabinet
-# 	# init_state = {"Name":"Agent1", \
-# 	# 	"Actor":{"Loc":{"X":-867.0,"Y":340.0,"Z":36.0},\
-# 	# 		"Rot":{"Pitch":0.0,"Yaw":90.0,"Roll":0.0}}, \
-# 	# 	"LeftHand":{"Grab": False, "Loc":{"X":65,"Y":-30,"Z":130},\
-# 	# 		"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},\
-# 	# 	"RightHand":{"Grab": False, "Loc":{"X":60,"Y":40,"Z":100},\
-# 	# 		"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},
-# 	# 	"Head": {"Rot":{"Pitch":-45.0,"Yaw":0.0,"Roll":0.0}}
-# 	# 	}
-# 	# Opening a beer bottle
-# 	init_state = {"Name":"Agent1", \
-# 		"Actor":{"Loc":{"X":-730.0,"Y":65.0,"Z":36.0},\
-# 			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}}, \
-# 		"LeftHand":{"Grab": True, "Loc":{"X":40,"Y":-30,"Z":75},\
-# 			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},\
-# 		"RightHand":{"Grab": True, "Loc":{"X":50,"Y":-5,"Z":95},\
-# 			"Rot":{"Pitch":0.0,"Yaw":0.0,"Roll":0.0}},
-# 		"Head": {"Rot":{"Pitch":-45.0,"Yaw":0.0,"Roll":0.0}}
-# 		}
-# 	config.task_fn = lambda: PixelVR(init_state, \
-# 		name="Opening Bottle", scale=1/2.0, normalized_state=False, \
-# 		max_steps=100, frame_skip=config.history_length)
-# 	action_dim = config.task_fn().action_dim
-# 	config.optimizer_fn = lambda params: torch.optim.Adam(params, 0.0005)
-# 	# config.optimizer_fn = lambda params: torch.optim.RMSprop(params, lr=0.00005, alpha=0.95, eps=0.01)
-# 	config.network_fn = lambda: NatureConvNet(config.history_length, action_dim, gpu=0)
-# 	# config.network_fn = lambda: DuelingNatureConvNet(config.history_length, action_dim)
-# 	# config.network_fn = lambda: FCNet([12, 256, 256, action_dim])
-# 	config.policy_fn = lambda: GreedyPolicy(epsilon=1.0, final_step=50000, min_epsilon=0.1)
-# 	config.replay_fn = lambda: Replay(memory_size=10000, batch_size=32, dtype=np.uint8)
-# 	config.reward_shift_fn = lambda r: (r)
-# 	config.discount = 0.99
-# 	config.target_network_update_freq = 2500
-# 	config.max_episode_length = 0
-# 	config.exploration_steps= 0
-# 	config.logger = Logger('./log', logger)
-# 	config.test_interval = 50
-# 	config.test_repetitions = 1
-# 	config.episode_limit = 10000000
-# 	config.double_q = True
-# 	# config.double_q = False
-# 	run_episodes(DQNAgent(config))
-
-# if __name__ == "__main__":
-# 	logger.setLevel(logging.INFO)
-# 	logger.setLevel(logging.DEBUG)
-# 	dqn_pixel_vr()
 	
 
 
