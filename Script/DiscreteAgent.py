@@ -1,7 +1,7 @@
 import sys, math, copy, time, subprocess, os
 #import rospy, tf
 import numpy as np
-from io import BytesIO
+from io import BytesIO, StringIO
 from rapidjson import loads,dumps 
 from socketClient import Client
 from socketServerU import Server
@@ -249,7 +249,15 @@ class DiscreteAgent(object):
 			if self.state['rgb']:
 				rgb_head = self.server.getBuffer()
 				assert(rgb_head == "RGB")
+				# try:
 				rgb_data = np.load(BytesIO(self.server.getBuffer()))
+				# rgb_data = Image.open(BytesIO(self.server.getBuffer()))
+				# rgb_data = np.asarray(rgb_data)
+				# except:
+				# 	print("load error")
+				# 	exit()
+				# 	raise Exception("load error")
+					
 				data_frame["rgb"] = rgb_data
 				# rgb_image = Image.fromarray(rgb_data)
 				# rgb_image.show()
@@ -285,8 +293,6 @@ class DiscreteAgent(object):
 				count_data = self.server.getBuffer()
 				data_frame["count"] = count_data			
 
-				
-			
 
 			data_frame["objects"] = object_data
 			data_frame["frame"] = self.frame
@@ -299,7 +305,7 @@ class DiscreteAgent(object):
 			return data_frame
 
 		except Exception as e:
-			print e
+			print(e)
 			return None
 
 	def RelToWorld(self, x, y, z, theta):
@@ -713,29 +719,29 @@ class DiscreteAgent(object):
 		elif action == "MoveToDoor":
 			self.MoveToObject("RightHand", "door", None, speed=10000, closest=True)
 			self.MoveToNeutral("RightHand", speed=10000)
-			print "MoveToDoor", time.time()-st
+			print("MoveToDoor", time.time()-st)
 		elif action == "GrabCup":
 			self.MoveAndGrabObject("RightHand", "Pour", "grabpoint", speed=10000, \
 				closest=True)
-			print "GrabCup", time.time()-st
+			print("GrabCup", time.time()-st)
 		elif action == "MoveToCoffeMaker":
 			self.MoveToObject("RightHand", "Coffe", "PlaceForCup", speed=10000, closest=True)
 			self.ReleaseObject("RightHand")
 			self.MoveToNeutral("RightHand", speed=10000)
-			print "MoveToCoffeMaker", time.time()-st
+			print("MoveToCoffeMaker", time.time()-st)
 		elif action == "OpenCoffeMaker":
 			self.MoveToObject("RightHand", "Coffe", "PowerButton", speed=10000, closest=True)
 			self.MoveToObject("RightHand", "Coffe", "PourCoffeeButton", speed=10000, closest=True)
 			self.MoveToNeutral("RightHand", speed=10000)
-			print "OpenCoffeMaker", time.time()-st
+			print("OpenCoffeMaker", time.time()-st)
 		elif action == "MoveToNeutral":
 			self.MoveToNeutral("RightHand", speed=10000)
 		elif action == "Crouch":
 			self.Crouch()
-			print "crouch", time.time()-st
+			print("crouch", time.time()-st)
 		elif action == "Standup":
 			self.Standup()
-			print "Standup", time.time()-st
+			print("Standup", time.time()-st)
 		elif action == "ActorMoveBackward":
 			self.Move("Actor", 0, scale=-x)
 			self.Move("Actor", 1, scale=-y)
@@ -810,7 +816,7 @@ class DiscreteAgent(object):
 		elif action == "RightHandRelease":
 			self.state["RightHand"]["Grab"] = False
 		else:
-			print "Not a valid command"
+			print("Not a valid command")
 
 		data_frame = None
 		i = 0

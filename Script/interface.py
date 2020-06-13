@@ -160,13 +160,13 @@ def start():
 	try:
 		os.makedirs(folder_name)
 	except:
-		print "folder exist"
+		print("folder exist")
 
 	try:
 		f_label = open(folder_name+"/action_label.txt", "w")
 		f_fluent = open(folder_name+"/fluent.txt", "w")
 	except:
-		print "files already open"
+		print("files already open")
 
 	r.GoTo('Orig', count = count, 
 			folder_name = folder_name, f_fluent= f_fluent)
@@ -310,7 +310,7 @@ def index():
 		# if obj == "BreadBP" or obj == "Cheese_sliced": #or obj == "Dough":
 		# 	pass
 		# else:
- 		temp.add("Fridge")
+		temp.add("Fridge")
 
 	if "Sauce" in tool and  r.env.state["Actor"]["Loc"] == tool["Sauce"]["Actor"]["Loc"] and (r.env.state["LeftHand"]["ActorName"]  or 
 		r.env.state["RightHand"]["ActorName"]):
