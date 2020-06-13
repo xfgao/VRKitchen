@@ -1,6 +1,6 @@
 numpy
 Pillow
-pyrapidjson
+python-rapidjson
 scikit-image
 scipy
 flask

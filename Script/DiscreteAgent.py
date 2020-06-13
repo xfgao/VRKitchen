@@ -304,8 +304,9 @@ class DiscreteAgent(object):
 			# 	print("objects: ", key)
 			return data_frame
 
-		except Exception as e:
-			print(e)
+		except Exception as inst:
+			print(type(inst))
+			print(inst.args)
 			return None
 
 	def RelToWorld(self, x, y, z, theta):

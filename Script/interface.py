@@ -18,6 +18,7 @@ import shutil
 
 import time
 import unicodedata
+
 r = recipe()
 
 pos = {"Orig":"","Juicer":"","Knife":"Board","Oven":"","Peeler":"",
@@ -274,13 +275,13 @@ def index():
 		temp = set(r.IngredList)
 
 	
-	for key, value in r.ObjDict.iteritems():
+	for key, value in r.ObjDict.items():
 		if loc  and str(value["Pos"])  != str(pos[loc]) and key in temp:
 			temp.remove(key)
 
 
 	#cannot take it away while on bread or pizza
-	for key, value in r.ObjDict.iteritems():
+	for key, value in r.ObjDict.items():
 		if (value["Pos"] == "BreadBP" or value["Pos"] == "Dough") and key in temp :
 			temp.remove(key)
 		
@@ -328,7 +329,7 @@ def index():
 
 	## interate obj list to find position of Dough and BreadBP 
 	
-	for key, value in r.ObjDict.iteritems():
+	for key, value in r.ObjDict.items():
 			locActor = r.env.state["Actor"]["Loc"]
 			
 			if key == "Dough":
@@ -428,16 +429,14 @@ def index():
 	for obj in ingredients:
 		try:
 			temp = dict()
-			for key, value in r.ObjDict[obj].iteritems():
+			for key, value in r.ObjDict[obj].items():
 				if str(value) == "True" or key == "Pos":
 					temp[key] = str(value)
 			state.append((obj,temp))
 		except:
 			pass
 
-
-
-	if cmp(sorted(state), sorted(goal_state) )==0 and active == True:
+	if sorted(state) == sorted(goal_state) and active == True:
 		done = True	
 		r.RecordSuccess(f_label = f_label)
 

@@ -40,7 +40,7 @@ class Server(object):
 				if not self.conn:
 					print("Connection break")
 					break
-				data = self.conn.recv(self.BUFSIZE)
+				data = self.conn.recv(self.BUFSIZE).decode("utf-8") 
 				if data == '' or data == None:
 					continue
 				# else:
