@@ -438,7 +438,7 @@ class DiscreteAgent(object):
 
 	def Walk(self, loc_final, speed=5, anim_speed=40):
 		loc_now = self.state["Actor"]["Loc"]
-		dif = np.array([loc_final[key] - loc_now[key] for key in loc_final])
+		dif = np.array([loc_final[key] - loc_now[key] for key in loc_now])
 		dif_len = np.linalg.norm(dif)
 
 		times = np.ceil(dif_len/speed)
@@ -446,7 +446,7 @@ class DiscreteAgent(object):
 
 		for i in np.arange(times):
 			cnt = 0
-			for key in loc_final:
+			for key in loc_now:
 				loc_now[key] += move_unit[cnt]
 				cnt += 1
 			
@@ -574,7 +574,7 @@ class DiscreteAgent(object):
 		eps = 1e-3
 		
 		loc_now =  self.state[entity]["WorldLoc"]
-		dif = np.array([loc_final[key] - loc_now[key] for key in loc_final])
+		dif = np.array([loc_final[key] - loc_now[key] for key in loc_now])
 		dif_len = np.linalg.norm(dif)
 
 		times = np.ceil(dif_len/speed+eps)
@@ -582,7 +582,7 @@ class DiscreteAgent(object):
 
 		for i in np.arange(times):
 			cnt = 0
-			for key in loc_final:
+			for key in loc_now:
 				loc_now[key] += move_unit[cnt]
 				cnt += 1
 			# print loc_now
@@ -622,7 +622,7 @@ class DiscreteAgent(object):
 		loc_now = self.state[entity]["WorldLoc"]
 		if loc_final == None:
 			loc_final = loc_now
-		dif = np.array([loc_final[key] - loc_now[key] for key in loc_final])
+		dif = np.array([loc_final[key] - loc_now[key] for key in loc_now])
 		dif_len = np.linalg.norm(dif)
 
 		times = np.ceil(dif_len/speed+eps)
@@ -630,7 +630,7 @@ class DiscreteAgent(object):
 
 		for i in np.arange(times):
 			cnt = 0
-			for key in loc_final:
+			for key in loc_now:
 				loc_now[key] += move_unit[cnt]
 				cnt += 1
 			
