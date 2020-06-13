@@ -567,6 +567,7 @@ class DiscreteAgent(object):
 		loc = self.state[entity]["NeutralLoc"]
 		x_new, y_new, z_new, _ = self.RelToWorld(loc["X"], loc["Y"], loc["Z"], 0)
 		loc_final = {"X":x_new, "Y":y_new, "Z":z_new}
+		print(loc_final)
 		return self.MoveToWorld(entity, loc_final, speed)		
 
 	def MoveContactToWorld(self, entity, loc_final, speed=SPEED):
