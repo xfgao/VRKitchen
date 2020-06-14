@@ -604,17 +604,13 @@ class DiscreteAgent(object):
 	def MoveContactToObject(self, entity, contact_name, \
 			actor_name, comp_name, speed=SPEED):
 		grab_actor_name = self.state[entity]["ActorName"]
-		temp = [
-			self.data["objects"][actor_name][comp_name]["Loc"][key] - \
+		loc_final = {}
+
+		for key in self.data["objects"][actor_name][comp_name]["Loc"]:
+			loc_final[key] = self.data["objects"][actor_name][comp_name]["Loc"][key] - \
 			self.data['objects'][grab_actor_name][contact_name]["Loc"][key] + \
-			self.state[entity]["WorldLoc"][key] 
-			for key in self.data["objects"][actor_name][comp_name]["Loc"]
-		]
-		loc_final = {"Y": temp[0], "X":temp[1], "Z":temp[2]}
-		# print self.data["objects"][actor_name][comp_name]["Loc"]
-		# print self.data['objects'][grab_actor_name][contact_name]["Loc"]
-		# print self.state[entity]["WorldLoc"] 
-		# print loc_final
+			self.state[entity]["WorldLoc"][key]
+
 		return self.MoveContactToWorld(entity, loc_final, speed)
 
 	def MoveToWorld(self, entity, loc_final, speed=SPEED):
