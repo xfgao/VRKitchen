@@ -4,7 +4,7 @@ from multiprocessing import Process
 
 class Server(object):
 	def __init__(self,endpoint):
-		self.BUFSIZE = 30000000
+		self.BUFSIZE = 131072
 		self.endpoint = endpoint
 		self.listener = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		self.listener.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
