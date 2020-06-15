@@ -13,8 +13,8 @@ class Server(object):
 		self.conn = None
 		self.receiving_thread = None
 		self.connected = False
-		self.buf = ""
-		self.delim = "\nEND OF FILE\n"
+		self.buf = b""
+		self.delim = b"\nEND OF FILE\n"
 		self.bufblock = False
 		# socket.setdefaulttimeout(3)
 
@@ -35,13 +35,12 @@ class Server(object):
 	def __receiving(self):
 		print("Server start to receive data!")
 		while True:
-			# print("thread running")
 			try:
 				if not self.conn:
 					print("Connection break")
 					break
-				data = self.conn.recv(self.BUFSIZE).decode("utf-8") 
-				if data == '' or data == None:
+				data = self.conn.recv(self.BUFSIZE)
+				if data == b'' or data == None or data == '':
 					continue
 				# else:
 					# print("Received data", data)
@@ -66,7 +65,7 @@ class Server(object):
 			buf = self.buf
 			if buf and self.delim in buf:
 				self.bufblock = True
-				self.buf = buf.split(self.delim, 1)[1]
+				self.buf = (buf.split(self.delim, 1)[1])
 				self.bufblock = False
 				# print(buf.split(delim, 1)[0])
 				break

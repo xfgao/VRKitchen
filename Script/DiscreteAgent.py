@@ -236,19 +236,21 @@ class DiscreteAgent(object):
 			data_frame = {}
 
 			object_head = self.server.getBuffer()
-			assert(object_head == "Objects")
+			
+			assert(object_head == b"Objects")
 			object_data = loads(self.server.getBuffer())
 			#print object_data
 			
 			if self.state['depth']:
 				depth_head = self.server.getBuffer()
-				assert(depth_head == "Depth")
+				assert(depth_head == b"Depth")
 				depth_data = np.load(BytesIO(self.server.getBuffer()))
 				data_frame["depth"] = depth_data
 
 			if self.state['rgb']:
 				rgb_head = self.server.getBuffer()
-				assert(rgb_head == "RGB")
+				assert(rgb_head == b"RGB")
+				
 				# try:
 				rgb_data = np.load(BytesIO(self.server.getBuffer()))
 				# rgb_data = Image.open(BytesIO(self.server.getBuffer()))
@@ -265,31 +267,31 @@ class DiscreteAgent(object):
 
 			if self.state['mask']:
 				mask_head = self.server.getBuffer()
-				assert(mask_head == "object_mask")
+				assert(mask_head == b"object_mask")
 				mask_data = np.load(BytesIO(self.server.getBuffer()))
 				data_frame["object_mask"] = mask_data
 		
 			
 			reward_head = self.server.getBuffer()
-			assert(reward_head == "Reward")
+			assert(reward_head == b"Reward")
 			reward = float(self.server.getBuffer())
 
 			done_head = self.server.getBuffer()
-			assert(done_head == "Done")
-			done = (self.server.getBuffer() == "1")
+			assert(done_head == b"Done")
+			done = (self.server.getBuffer() == b"1")
 
 			success_head = self.server.getBuffer()
-			assert(success_head == "Success")
-			success = (self.server.getBuffer() == "1")
+			assert(success_head == b"Success")
+			success = (self.server.getBuffer() == b"1")
 
 			if self.state['command']:
 				command_head = self.server.getBuffer()
-				assert(command_head == "Command")
+				assert(command_head == b"Command")
 				command_data = self.server.getBuffer()
 				data_frame["command"] = command_data
 
 				count_head = self.server.getBuffer()
-				assert(count_head == "CommandCount")
+				assert(count_head == b"CommandCount")
 				count_data = self.server.getBuffer()
 				data_frame["count"] = count_data			
 

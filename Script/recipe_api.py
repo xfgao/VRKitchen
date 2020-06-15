@@ -53,7 +53,7 @@ class recipe(object):
                                                 "WorldLoc": {"X": 0, "Y": 0, "Z": 0}},
 
                                   "Head": {"Rot": {"Pitch": -10, "Yaw": 0.0, "Roll": 0}},
-                                  "rgb": False, "depth": False, "mask": False, "command": True,
+                                  "rgb": True, "depth": False, "mask": False, "command": True,
                                   "scene": "2"
                                   }
                                  )
