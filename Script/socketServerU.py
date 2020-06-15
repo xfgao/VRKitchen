@@ -16,6 +16,7 @@ class Server(object):
 		self.buf = b""
 		self.delim = b"\nEND OF FILE\n"
 		self.bufblock = False
+		self.cv = threading.Condition()
 		# socket.setdefaulttimeout(3)
 
 	def listen(self):
@@ -44,9 +45,11 @@ class Server(object):
 					continue
 				# else:
 					# print("Received data", data)
+				self.cv.acquire()
 				while self.bufblock == True:
-					pass
+					self.cv.wait()
 				self.buf += data
+				self.cv.release()
 			except Exception:
 				continue
 			
@@ -65,8 +68,11 @@ class Server(object):
 			buf = self.buf
 			if buf and self.delim in buf:
 				self.bufblock = True
+				self.cv.acquire()
 				self.buf = (buf.split(self.delim, 1)[1])
 				self.bufblock = False
+				self.cv.notify()
+				self.cv.release()
 				# print(buf.split(delim, 1)[0])
 				break
 				# print("remaining", self.buf)
