@@ -1,6 +1,6 @@
 numpy==1.16.2
 torch==0.4.1
-pillow==5.4.1
+pillow==8.2.0
 scikit-image==0.14.2
 torchvision==0.2.1
 psutil==3.4.2
