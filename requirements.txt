@@ -3,7 +3,7 @@ torch==0.4.1
 pillow==5.4.1
 scikit-image==0.14.2
 torchvision==0.2.1
-psutil==3.4.2
+psutil==5.6.6
 opencv-python==4.0.0.21
 tqdm==4.31.1
 pathlib2==2.3.3
